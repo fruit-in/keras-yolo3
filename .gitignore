@@ -106,3 +106,9 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# nuscenes-devkit
+nuscenes/
+
+# dataset
+dataset/
