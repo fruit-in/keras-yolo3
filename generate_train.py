@@ -1,7 +1,7 @@
 from nuscenes.nuscenes import NuScenes
 
 dataroot = 'dataset/nuscenes/'
-nusc = NuScenes(version='v0.1', dataroot=dataroot, verbose=True)
+nusc = NuScenes(version='v1.0-mini', dataroot=dataroot, verbose=True)
 
 sensors = ['CAM_FRONT', 'CAM_BACK',
            'CAM_FRONT_LEFT', 'CAM_BACK_LEFT',
