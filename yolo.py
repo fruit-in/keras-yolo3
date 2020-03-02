@@ -23,7 +23,7 @@ class YOLO(object):
         "model_path": 'model_data/yolo.h5',
         "anchors_path": 'model_data/nuscenes_anchors.txt',
         "classes_path": 'model_data/nuscenes_classes.txt',
-        "score" : 0.1,
+        "score" : 0.3,
         "iou" : 0.45,
         "model_image_size" : (416, 416),
         "gpu_num" : 1,
