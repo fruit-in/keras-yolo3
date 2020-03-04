@@ -1,7 +1,7 @@
 from nuscenes.nuscenes import NuScenes
 
 dataroot = 'dataset/nuscenes/'
-nusc = NuScenes(version='v1.0-mini', dataroot=dataroot, verbose=True)
+nusc = NuScenes(version='v1.0-trainval', dataroot=dataroot, verbose=True)
 
 sensors = ['CAM_FRONT', 'CAM_BACK',
            'CAM_FRONT_LEFT', 'CAM_BACK_LEFT',
@@ -32,7 +32,7 @@ category = {
     'static_object.bicycle_rack': 22
 }
 
-with open('train.txt', 'w') as f:
+with open('annotations.txt', 'w') as f:
     for scene in nusc.scene:
         sample_token = scene['first_sample_token']
 
