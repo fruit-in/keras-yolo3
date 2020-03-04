@@ -44,7 +44,7 @@ def _main():
     with open(val_path) as f:
         val_lines = f.readlines()
     np.random.seed(10101)
-    np.random.shuffle(lines)
+    np.random.shuffle(train_lines)
     np.random.seed(None)
     num_train = len(train_lines)
     num_val = len(val_lines)
