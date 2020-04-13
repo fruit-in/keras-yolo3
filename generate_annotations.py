@@ -3,9 +3,7 @@ from nuscenes.nuscenes import NuScenes
 dataroot = 'dataset/nuscenes/'
 nusc = NuScenes(version='v1.0-trainval', dataroot=dataroot, verbose=True)
 
-sensors = ['CAM_FRONT', 'CAM_BACK',
-           'CAM_FRONT_LEFT', 'CAM_BACK_LEFT',
-           'CAM_FRONT_RIGHT', 'CAM_BACK_RIGHT']
+sensors = ['CAM_FRONT']
 category = {
     'animal': 0,
     'human.pedestrian.adult': 1,

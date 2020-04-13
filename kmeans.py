@@ -1,13 +1,12 @@
 import numpy as np
 
-
 class YOLO_Kmeans:
 
     def __init__(self, cluster_number, filename):
         self.cluster_number = cluster_number
-        self.filename = "annotations.txt"
+        self.filename = "temp.txt"
 
-    def iou(self, boxes, clusters):  # 1 box -> k clusters
+    def iou(self, boxes, clusters):
         n = boxes.shape[0]
         k = self.cluster_number
 
@@ -41,16 +40,16 @@ class YOLO_Kmeans:
         last_nearest = np.zeros((box_number,))
         np.random.seed()
         clusters = boxes[np.random.choice(
-            box_number, k, replace=False)]  # init k clusters
+            box_number, k, replace=False)]
         while True:
 
             distances = 1 - self.iou(boxes, clusters)
 
             current_nearest = np.argmin(distances, axis=1)
             if (last_nearest == current_nearest).all():
-                break  # clusters won't change
+                break
             for cluster in range(k):
-                clusters[cluster] = dist(  # update clusters
+                clusters[cluster] = dist(
                     boxes[current_nearest == cluster], axis=0)
 
             last_nearest = current_nearest
@@ -96,6 +95,6 @@ class YOLO_Kmeans:
 
 if __name__ == "__main__":
     cluster_number = 9
-    filename = "annotations.txt"
+    filename = "temp.txt"
     kmeans = YOLO_Kmeans(cluster_number, filename)
     kmeans.txt2clusters()
