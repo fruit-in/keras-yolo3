@@ -7,7 +7,7 @@ from keras.models import load_model
 from keras.layers import Input
 from PIL import Image, ImageFont, ImageDraw
 
-from yolo3.model import yolo_eval, yolo_body, tiny_yolo_body
+from yolo3.model import yolo_eval, yolo_body
 from yolo3.utils import letterbox_image
 
 class YOLO(object):
@@ -37,11 +37,7 @@ class YOLO(object):
         num_anchors = len(self.anchors)
         num_classes = len(self.class_names)
 
-        is_tiny_version = num_anchors==6
-        if is_tiny_version:
-            self.yolo_model = tiny_yolo_body(Input(shape=(None, None, 3)), num_anchors // 2, num_classes)
-        else:
-            self.yolo_model = yolo_body(Input(shape=(None, None, 3)), num_anchors // 3, num_classes)
+        self.yolo_model = yolo_body(Input(shape=(None, None, 3)), num_anchors // 3, num_classes)
         self.yolo_model.load_weights(weights_path)
 
         hsv_tuples = [(x / len(self.class_names), 1., 1.)
