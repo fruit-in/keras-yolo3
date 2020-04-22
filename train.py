@@ -11,7 +11,7 @@ from yolo3.utils import get_random_data
 def main():
     train_path = 'train.txt'
     val_path = 'val.txt'
-    log_dir = 'logs/000/'
+    log_dir = 'logs/002/'
     class_names = get_classes('model_data/nuscenes_classes.txt')
     num_classes = len(class_names)
     anchors = get_anchors('model_data/nuscenes_anchors.txt')
@@ -22,7 +22,7 @@ def main():
 
     logging = TensorBoard(log_dir=log_dir)
     checkpoint = ModelCheckpoint(log_dir + 'ep{epoch:03d}-loss{loss:.3f}-val_loss{val_loss:.3f}.h5',
-        monitor='val_loss', save_weights_only=True, save_best_only=True, period=3)
+        monitor='val_loss', save_weights_only=True, period=5)
 
     with open(train_path) as f:
         train_lines = f.readlines()
@@ -33,7 +33,7 @@ def main():
 
     for i in range(len(model.layers)):
         model.layers[i].trainable = True
-    model.compile(optimizer=Adam(lr=1e-4), loss={'yolo_loss': lambda y_true, y_pred: y_pred})
+    model.compile(optimizer=Adam(lr=1e-6), loss={'yolo_loss': lambda y_true, y_pred: y_pred})
 
     batch_size = 16
     print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
@@ -41,25 +41,25 @@ def main():
         steps_per_epoch=max(1, num_train // batch_size),
         validation_data=data_generator_wrapper(val_lines, batch_size, input_shape, anchors, num_classes),
         validation_steps=max(1, num_val // batch_size),
-        epochs=100,
-        initial_epoch=0,
+        epochs=300,
+        initial_epoch=200,
         callbacks=[logging, checkpoint])
     model.save_weights(log_dir + 'trained_weights_final.h5')
 
 def get_classes(classes_path):
-    with open('./model_data/nuscenes_classes.txt') as f:
+    with open(classes_path) as f:
         class_names = f.readlines()
     class_names = [c.strip() for c in class_names]
     return class_names
 
 def get_anchors(anchors_path):
-    with open('./model_data/nuscenes_anchors.txt') as f:
+    with open(anchors_path) as f:
         anchors = f.readline()
     anchors = [float(x) for x in anchors.split(',')]
     return np.array(anchors).reshape(-1, 2)
 
 def create_model(input_shape, anchors, num_classes, load_pretrained=True,
-            weights_path='model_data/yolo_weights.h5'):
+            weights_path='model_data/yolo.h5'):
     K.clear_session()
     image_input = Input(shape=(None, None, 3))
     h, w = input_shape

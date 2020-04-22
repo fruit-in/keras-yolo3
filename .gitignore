@@ -4,8 +4,5 @@ pic
 __pycache__
 yolo3/__pycache__
 model_data/yolo.h5
-logs/*.txt
-logs/*.py
-logs/*.png
 test_results/mAP/ground_truth
 test_results/mAP/detection_results

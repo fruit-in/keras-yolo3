@@ -6,13 +6,12 @@ import numpy as np
 import tensorflow as tf
 from keras import backend as K
 from keras.layers import Conv2D, Add, ZeroPadding2D, UpSampling2D, Concatenate, MaxPooling2D
-from keras.layers.advanced_activations import LeakyReLU
-from keras.layers.normalization import BatchNormalization
+from keras.layers import LeakyReLU
+from keras.layers import BatchNormalization
 from keras.models import Model
 from keras.regularizers import l2
 
 from yolo3.utils import compose
-
 
 @wraps(Conv2D)
 def DarknetConv2D(*args, **kwargs):
@@ -66,7 +65,6 @@ def make_last_layers(x, num_filters, out_filters):
             DarknetConv2D(out_filters, (1,1)))(x)
     return x, y
 
-
 def yolo_body(inputs, num_anchors, num_classes):
     """Create YOLO_V3 model CNN body in Keras."""
     darknet = Model(inputs, darknet_body(inputs))
@@ -113,7 +111,6 @@ def yolo_head(feats, anchors, num_classes, input_shape, calc_loss=False):
         return grid, feats, box_xy, box_wh
     return box_xy, box_wh, box_confidence, box_class_probs
 
-
 def yolo_correct_boxes(box_xy, box_wh, input_shape, image_shape):
     '''Get corrected boxes'''
     box_yx = box_xy[..., ::-1]
@@ -139,7 +136,6 @@ def yolo_correct_boxes(box_xy, box_wh, input_shape, image_shape):
     boxes *= K.concatenate([image_shape, image_shape])
     return boxes
 
-
 def yolo_boxes_and_scores(feats, anchors, num_classes, input_shape, image_shape):
     '''Process Conv layer output'''
     box_xy, box_wh, box_confidence, box_class_probs = yolo_head(feats,
@@ -149,7 +145,6 @@ def yolo_boxes_and_scores(feats, anchors, num_classes, input_shape, image_shape)
     box_scores = box_confidence * box_class_probs
     box_scores = K.reshape(box_scores, [-1, num_classes])
     return boxes, box_scores
-
 
 def yolo_eval(yolo_outputs,
               anchors,
@@ -178,6 +173,7 @@ def yolo_eval(yolo_outputs,
     scores_ = []
     classes_ = []
     for c in range(num_classes):
+        # TODO: use keras backend instead of tf.
         class_boxes = tf.boolean_mask(boxes, mask[:, c])
         class_box_scores = tf.boolean_mask(box_scores[:, c], mask[:, c])
         nms_index = tf.image.non_max_suppression(
@@ -193,7 +189,6 @@ def yolo_eval(yolo_outputs,
     classes_ = K.concatenate(classes_, axis=0)
 
     return boxes_, scores_, classes_
-
 
 def preprocess_true_boxes(true_boxes, input_shape, anchors, num_classes):
     '''Preprocess true boxes to training input format
@@ -266,7 +261,6 @@ def preprocess_true_boxes(true_boxes, input_shape, anchors, num_classes):
 
     return y_true
 
-
 def box_iou(b1, b2):
     '''Return iou tensor
 
@@ -307,13 +301,12 @@ def box_iou(b1, b2):
 
     return iou
 
-
 def yolo_loss(args, anchors, num_classes, ignore_thresh=.5, print_loss=False):
     '''Return yolo_loss tensor
 
     Parameters
     ----------
-    yolo_outputs: list of tensor, the output of yolo_body or tiny_yolo_body
+    yolo_outputs: list of tensor, the output of yolo_body
     y_true: list of array, the output of preprocess_true_boxes
     anchors: array, shape=(N, 2), wh
     num_classes: integer
@@ -346,7 +339,7 @@ def yolo_loss(args, anchors, num_classes, ignore_thresh=.5, print_loss=False):
         raw_true_xy = y_true[l][..., :2]*grid_shapes[l][::-1] - grid
         raw_true_wh = K.log(y_true[l][..., 2:4] / anchors[anchor_mask[l]] * input_shape[::-1])
         raw_true_wh = K.switch(object_mask, raw_true_wh, K.zeros_like(raw_true_wh)) # avoid log(0)=-inf
-        box_loss_scale = 2 - y_true[l][...,2:3]*y_true[l][...,3:4]
+        box_loss_scale = (2 - y_true[l][...,2:3]*y_true[l][...,3:4]) * 2
 
         # Find ignore mask, iterate over each of batch.
         ignore_mask = tf.TensorArray(K.dtype(y_true[0]), size=1, dynamic_size=True)
