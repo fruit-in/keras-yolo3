@@ -1,5 +1,6 @@
 import colorsys
 from timeit import default_timer as timer
+import os
 
 import numpy as np
 from keras import backend as K
@@ -9,6 +10,8 @@ from PIL import Image, ImageFont, ImageDraw
 
 from yolo3.model import yolo_eval, yolo_body
 from yolo3.utils import letterbox_image
+
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 class YOLO(object):
     def __init__(self):
@@ -83,7 +86,7 @@ class YOLO(object):
 
             label = '{} {:.2f}'.format(predicted_class, score)
             draw = ImageDraw.Draw(image)
-            label_size = draw.textsize(label, font)
+            label_size = draw.textsize(predicted_class, font)
 
             top, left, bottom, right = box
             top = max(0, np.floor(top + 0.5).astype('int32'))
@@ -141,11 +144,8 @@ def detect_video(yolo, video_path, output_path=""):
             int(vid.get(cv2.CAP_PROP_FRAME_HEIGHT)))
     if output_path:
         out = cv2.VideoWriter(output_path, video_FourCC, video_fps, video_size)
-    frame_count = 0
-    start = timer()
     while True:
         return_value, frame = vid.read()
-        frame_count += 1
         if not return_value:
             break
         image = Image.fromarray(frame)
@@ -157,8 +157,6 @@ def detect_video(yolo, video_path, output_path=""):
             out.write(result)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
-    end = timer()
-    print("FPS:", frame_count / (end - start()))
     yolo.close_session()
 
 def detect_test_set(yolo, test_path, output_path=""):
