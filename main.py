@@ -1,35 +1,20 @@
-import sys
-import argparse
-from yolo import YOLO, detect_image, detect_video, detect_test_set
+from PIL import Image
+from yolo import YOLO
 
-FLAGS = None
+def main():
+    yolo = YOLO()
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(argument_default=argparse.SUPPRESS)
-    parser.add_argument(
-        '--image', default=False, action='store_true',
-        help='Image detection mode, will ignore all positional arguments'
-    )
-    parser.add_argument(
-        '--video', nargs='?', type=str, required=False, default='',
-        help = 'Video input path'
-    )
-    parser.add_argument(
-        '--testset', nargs='?', type=str, required=False, default='',
-        help = 'Text set input path'
-    )
-    parser.add_argument(
-        '--output', nargs='?', type=str, default='',
-        help = 'Output path'
-    )
+    while True:
+        image_path = input('Input image filename:')
+        try:
+            image = Image.open(image_path)
+        except:
+            print('Open Error! Try again!')
+            continue
+        else:
+            i = yolo.detect_image(image.crop((290, 400, 1330, 900)))
+            i.save('a.jpg')
 
-    FLAGS = parser.parse_args()
+    yolo.close_session()
 
-    if FLAGS.image:
-        detect_image(YOLO())
-    elif FLAGS.testset:
-        detect_test_set(YOLO(), FLAGS.testset, FLAGS.output)
-    elif FLAGS.video:
-        detect_video(YOLO(), FLAGS.video, FLAGS.output)
-    else:
-        print('Must specify at least input_path. See usage with --help.')
+main()

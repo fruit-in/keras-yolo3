@@ -1,8 +1,0 @@
-dataset
-nuscenes
-pic
-__pycache__
-yolo3/__pycache__
-model_data/yolo.h5
-test_results/mAP/ground_truth
-test_results/mAP/detection_results
